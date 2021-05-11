@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/ducher/covid-termin-alert/issues"
   },
-  "homepage": "https://github.com/ducher/covid-termin-alert#readme"
+  "homepage": "https://github.com/ducher/covid-termin-alert#readme",
+  "dependencies": {
+    "sendmail": "^1.6.1"
+  }
 }
