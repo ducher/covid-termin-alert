@@ -18,6 +18,6 @@
   },
   "homepage": "https://github.com/ducher/covid-termin-alert#readme",
   "dependencies": {
-    "sendmail": "^1.6.1"
+    "@sendgrid/mail": "^7.4.4"
   }
 }

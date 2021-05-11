@@ -1,5 +1,5 @@
 const https = require("https")
-const sendmail = require('sendmail')();
+const sgMail = require('@sendgrid/mail');
 
 const APPOINTMENT_API = 'www.doctolib.de';
 const API_PATH = "/availabilities.json";
@@ -9,6 +9,7 @@ function getConf() {
         console.log(process.env.CONF);
         return JSON.parse(process.env.CONF);
     } else {
+        console.log('reading conf from file');
         const conf = require('./conf.json');
         return conf;
     }
@@ -35,15 +36,23 @@ https
             console.log(parsedData.availabilities.length);
             console.log(parsedData.total);
             const conf = getConf();
-            sendmail({
+            
+            sgMail.setApiKey(conf.sendgridApiKey);
+            const emailContent = `There are at least ${parsedData.availabilities.length} appointments available.`;
+            sgMail.send({
                 from: conf.email.from,
                 to: conf.email.to,
                 subject: conf.email.subject,
-                html: 'Mail of test sendmail ',
-              }, (err, reply) => {
-                console.log(err && err.stack);
-                console.dir(reply);
-            });
+                html: emailContent,
+                text: emailContent,
+              })
+              .then((response) => {
+                console.log(response[0].statusCode)
+                console.log(response[0].headers)
+              })
+              .catch((error) => {
+                console.error(error)
+              });
         }
       })
     }
