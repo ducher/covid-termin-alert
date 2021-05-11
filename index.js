@@ -6,6 +6,7 @@ const API_PATH = "/availabilities.json";
 
 function getConf() {
     if(process.env.CONF) {
+        console.log('reading conf from env');
         console.log(process.env.CONF);
         return JSON.parse(process.env.CONF);
     } else {
@@ -14,6 +15,9 @@ function getConf() {
         return conf;
     }
 }
+
+const conf = getConf();
+sgMail.setApiKey(conf.sendgridApiKey);
 
 https
   .request(
@@ -33,26 +37,30 @@ https
          */
         const parsedData = JSON.parse(data);
         if(parsedData.availabilities) {
-            console.log(parsedData.availabilities.length);
-            console.log(parsedData.total);
-            const conf = getConf();
-            
-            sgMail.setApiKey(conf.sendgridApiKey);
-            const emailContent = `There are at least ${parsedData.availabilities.length} appointments available.`;
-            sgMail.send({
-                from: conf.email.from,
-                to: conf.email.to,
-                subject: conf.email.subject,
-                html: emailContent,
-                text: emailContent,
-              })
-              .then((response) => {
-                console.log(response[0].statusCode)
-                console.log(response[0].headers)
-              })
-              .catch((error) => {
-                console.error(error)
-              });
+            const nbAvail = parsedData.availabilities.length;
+            const nextSlot = parsedData.next_slot;
+            console.log(`Number of availabilities: ${nbAvail}`);
+            console.log(`Next slot: ${nextSlot}`);
+
+            if(nbAvail > 0) {
+                const emailContent = `There are at least ${parsedData.availabilities.length} appointments available. \n Next slot date: ${nextSlot}`;
+                sgMail.send({
+                    from: conf.email.from,
+                    to: conf.email.to,
+                    subject: conf.email.subject,
+                    html: emailContent,
+                    text: emailContent,
+                  })
+                  .then((response) => {
+                    console.log(response[0].statusCode)
+                    console.log(response[0].headers)
+                  })
+                  .catch((error) => {
+                    console.error(error)
+                  });
+            } else {
+                console.log('No slot available :( sorry Brubo');
+            }
         }
       })
     }
