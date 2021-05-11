@@ -72,7 +72,7 @@ function queryAPIForAppointment() {
     .end();
 }
 
-  cron.schedule('*/2 * * * *', queryAPIForAppointment);
+  cron.schedule('*/5 * * * *', queryAPIForAppointment);
   http.createServer((req, res) => {
     res.writeHead(200, {'Content-Type': 'text/plain'});
     res.end('Kein Termin Hier\n');
