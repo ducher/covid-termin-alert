@@ -1,9 +1,11 @@
-const https = require("https")
+const https = require("https");
+const http = require("http");
 const sgMail = require('@sendgrid/mail');
 const cron = require('node-cron');
 
 const APPOINTMENT_API = 'www.doctolib.de';
 const API_PATH = "/availabilities.json";
+const PORT = process.env.PORT || 5000;
 
 function getConf() {
     if(process.env.CONF) {
@@ -71,3 +73,8 @@ function queryAPIForAppointment() {
 }
 
   cron.schedule('*/2 * * * *', queryAPIForAppointment);
+  http.createServer((req, res) => {
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.end('Kein Termin Hier\n');
+  }).listen(PORT, "127.0.0.1");
+  console.log(`Server running at http://127.0.0.1:${PORT}/`);
