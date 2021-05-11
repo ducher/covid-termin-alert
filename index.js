@@ -1,10 +1,18 @@
 const https = require("https")
 const sendmail = require('sendmail')();
 
-const conf = require('./conf.json');
-
 const APPOINTMENT_API = 'www.doctolib.de';
 const API_PATH = "/availabilities.json";
+
+function getConf() {
+    if(process.env.CONF) {
+        console.log(process.env.CONF);
+        return JSON.parse(process.env.CONF);
+    } else {
+        const conf = require('./conf.json');
+        return conf;
+    }
+}
 
 https
   .request(
@@ -26,6 +34,7 @@ https
         if(parsedData.availabilities) {
             console.log(parsedData.availabilities.length);
             console.log(parsedData.total);
+            const conf = getConf();
             sendmail({
                 from: conf.email.from,
                 to: conf.email.to,
